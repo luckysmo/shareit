@@ -30,14 +30,13 @@ public class ItemRepoImpl {
 
     public Optional<Item> getById(long itemId) {
         log.debug("returned item with id {}", itemId);
-        return Optional.ofNullable(Optional.of(items.get(itemId))
-                .orElseThrow(() -> new NotFoundException("Item with id" + itemId + " not found!")));
+        return Optional.ofNullable(Optional.of(items.get(itemId)).orElseThrow(() -> new NotFoundException("Item with id" + itemId + " not found!")));
     }
 
     public Item update(Item item) {
         items.replace(item.getId(), item);
         log.debug("updated item {}", item);
-        return getById(item.getId()).orElseThrow(()-> new NotFoundException("Item with id" + item.getId() + " not found!"));
+        return getById(item.getId()).orElseThrow(() -> new NotFoundException("Item with id" + item.getId() + " not found!"));
     }
 
     public List<Item> getAllItemsOfOneUser(long userId) {

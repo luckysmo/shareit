@@ -6,7 +6,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 @Service
 public class ItemMapper {
 
-    public Item mapToItem(ItemDto itemDto){
+    public Item mapToItem(ItemDto itemDto) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName(),
@@ -17,7 +17,7 @@ public class ItemMapper {
         );
     }
 
-    public ItemDto mapToItemDto(Item item){
+    public ItemDto mapToItemDto(Item item) {
         return new ItemDto(
                 item.getId(),
                 item.getName(),

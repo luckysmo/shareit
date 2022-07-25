@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 
 @Service
-public class requestsMapper {
+public class RequestsMapper {
 
     public ItemRequest mapToUser(ItemRequestDto itemRequestDto) {
         return new ItemRequest(

@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
         Item itemExisted = itemRepo.getById(itemId)
                 .get();
         if (itemRepo.getById(itemId).get().getOwner().getId() == userId) {
-            if (item.getId() == null){
+            if (item.getId() == null) {
                 item.setId(itemExisted.getId());
             }
             if (item.getName() == null) {
@@ -53,18 +53,17 @@ public class ItemServiceImpl implements ItemService {
             if (item.getDescription() == null) {
                 item.setDescription(itemExisted.getDescription());
             }
-            if (item.getOwner() == null){
+            if (item.getOwner() == null) {
                 item.setOwner(itemExisted.getOwner());
             }
-            if(item.getAvailable() == null){
+            if (item.getAvailable() == null) {
                 item.setAvailable(itemExisted.getAvailable());
             }
-                return mapper.mapToItemDto(itemRepo.update(item));
+            return mapper.mapToItemDto(itemRepo.update(item));
         } else {
             throw new NotFoundException("User don't have this item");
         }
     }
-
 
     public List<ItemDto> getAllItemsOfOneUser(long userId) {
         List<ItemDto> result = new ArrayList<>();
@@ -82,7 +81,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> searchItem(String text) {
         List<ItemDto> result = new ArrayList<>();
-        if(!text.isEmpty()) {
+        if (!text.isEmpty()) {
             for (Item item : itemRepo.getAll()) {
                 if (item.getName().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT)) ||
                         item.getDescription().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))) {
@@ -92,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
                 }
             }
             return result;
-        }else {
+        } else {
             return new ArrayList<>();
         }
     }

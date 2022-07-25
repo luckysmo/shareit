@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
@@ -30,23 +29,23 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable long userId){
+    public UserDto getUserById(@PathVariable long userId) {
         return userService.getById(userId);
     }
 
     @GetMapping
-    public List<UserDto> getAllUsers(){
+    public List<UserDto> getAllUsers() {
         return userService.getAll();
     }
 
     @PatchMapping(value = "/{userID}")
     public UserDto patch(@PathVariable long userID,
-                         @RequestBody User user){
-        return userService.update(userID,user);
+                         @RequestBody User user) {
+        return userService.update(userID, user);
     }
 
     @DeleteMapping("/{userID}")
-    public void delete(@PathVariable long userID){
+    public void delete(@PathVariable long userID) {
         userService.delete(userID);
     }
 }

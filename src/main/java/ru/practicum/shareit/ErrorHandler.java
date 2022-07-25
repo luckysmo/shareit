@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
-import javax.validation.UnexpectedTypeException;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -28,7 +27,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<?> exc(final MethodArgumentNotValidException e){
+    public ResponseEntity<?> exc(final MethodArgumentNotValidException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

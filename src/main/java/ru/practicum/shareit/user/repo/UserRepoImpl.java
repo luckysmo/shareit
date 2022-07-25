@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Slf4j
 @Repository
-public class UserRepoImpl implements UserRepo{
+public class UserRepoImpl implements UserRepo {
 
     private static long idCounter = 0;
     private final HashMap<Long, User> users = new HashMap<>();
@@ -31,7 +31,7 @@ public class UserRepoImpl implements UserRepo{
         return true;
     }
 
-    public boolean isExist(long userId){
+    public boolean isExist(long userId) {
         return users.containsKey(userId);
     }
 
@@ -44,8 +44,7 @@ public class UserRepoImpl implements UserRepo{
 
     public Optional<User> getById(Long userId) {
         log.debug("returned user with id {}", userId);
-        return Optional.ofNullable(Optional.of(users.get(userId))
-                .orElseThrow(() -> new NotFoundException("User not found!!!")));
+        return Optional.ofNullable(Optional.of(users.get(userId)).orElseThrow(() -> new NotFoundException("User not found!!!")));
     }
 
     public User update(User user) {
