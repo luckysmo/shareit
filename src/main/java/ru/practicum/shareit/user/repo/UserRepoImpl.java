@@ -2,7 +2,7 @@ package ru.practicum.shareit.user.repo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.NotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
@@ -44,13 +44,14 @@ public class UserRepoImpl implements UserRepo {
 
     public Optional<User> getById(Long userId) {
         log.debug("returned user with id {}", userId);
-        return Optional.ofNullable(Optional.of(users.get(userId)).orElseThrow(() -> new NotFoundException("User not found!!!")));
+        return Optional.ofNullable(Optional.of(users.get(userId))
+                .orElseThrow(() -> new NotFoundException("User not found!!!")));
     }
 
     public User update(User user) {
         users.replace(user.getId(), user);
         log.debug("user updated");
-        return getById(user.getId()).get();
+        return getById(user.getId()).orElseThrow(() -> new NotFoundException("User not found!!!"));
     }
 
     public void delete(long userID) {

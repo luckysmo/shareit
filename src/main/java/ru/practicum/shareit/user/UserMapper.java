@@ -1,12 +1,12 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.stereotype.Service;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.dto.UserDto;
 
-@Service
+@NoArgsConstructor
 public class UserMapper {
 
-    public User mapToUser(UserDto userDto) {
+    public static User mapToUser(UserDto userDto) {
         return new User(
                 userDto.getId(),
                 userDto.getName(),
@@ -14,7 +14,7 @@ public class UserMapper {
         );
     }
 
-    public UserDto mapToUserDto(User user) {
+    public static UserDto mapToUserDto(User user) {
         return new UserDto(
                 user.getId(),
                 user.getName(),

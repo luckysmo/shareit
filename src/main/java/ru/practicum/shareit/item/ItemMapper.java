@@ -1,12 +1,12 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.stereotype.Service;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-@Service
+@NoArgsConstructor
 public class ItemMapper {
 
-    public Item mapToItem(ItemDto itemDto) {
+    public static Item mapToItem(ItemDto itemDto) {
         return new Item(
                 itemDto.getId(),
                 itemDto.getName(),
@@ -17,7 +17,7 @@ public class ItemMapper {
         );
     }
 
-    public ItemDto mapToItemDto(Item item) {
+    public static ItemDto mapToItemDto(Item item) {
         return new ItemDto(
                 item.getId(),
                 item.getName(),

@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.repo;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.NotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.Item;
 
 import java.util.ArrayList;

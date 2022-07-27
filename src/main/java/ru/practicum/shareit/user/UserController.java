@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +19,11 @@ import java.util.List;
 @RequestMapping("/users")
 @RestController
 public class UserController {
-    @Autowired
-    UserServiceImpl userService;
+    final UserServiceImpl userService;
+
+    public UserController(UserServiceImpl userService) {
+        this.userService = userService;
+    }
 
     @PostMapping
     public UserDto addUser(@Valid @RequestBody User user) {

@@ -1,39 +1,40 @@
 package ru.practicum.shareit.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.NotFoundException;
+import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.UserMapper;
-import ru.practicum.shareit.user.repo.UserRepoImpl;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.repo.UserRepoImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.practicum.shareit.user.UserMapper.mapToUserDto;
+
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserMapper mapper;
-    @Autowired
-    private UserRepoImpl userRepo;
+    private final UserRepoImpl userRepo;
+
+    public UserServiceImpl(UserRepoImpl userRepo) {
+        this.userRepo = userRepo;
+    }
 
     public UserDto addNewUser(User user) {
         if (userRepo.isExistEmail(user)) {
             userRepo.add(user);
-            return mapper.mapToUserDto(user);
+            return mapToUserDto(user);
         } else {
             throw new RuntimeException("User already added!!!");
         }
     }
 
     public UserDto getById(long userId) {
-        return mapper.mapToUserDto(userRepo.getById(userId)
-                .get());
+        return mapToUserDto(userRepo.getById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found!!!")));
     }
 
     public UserDto update(long userID, User user) {
-        User userExisting = userRepo.getById(userID).get();
+        User userExisting = userRepo.getById(userID).orElseThrow(() -> new NotFoundException("User not found!!!"));
         if (userRepo.isExist(userID)) {
             user.setId(userID);
             if (user.getEmail() == null) {
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
                     throw new IllegalArgumentException("Email exists!!!");
                 }
             }
-            return mapper.mapToUserDto(userRepo.update(user));
+            return mapToUserDto(userRepo.update(user));
         } else {
             throw new NotFoundException("User not found!!!");
         }
@@ -64,7 +65,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getAll() {
         List<UserDto> result = new ArrayList<>();
         for (User user : userRepo.getAll()) {
-            result.add(mapper.mapToUserDto(user));
+            result.add(mapToUserDto(user));
         }
         return result;
     }
