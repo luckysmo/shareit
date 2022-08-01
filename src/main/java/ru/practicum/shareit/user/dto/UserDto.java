@@ -9,10 +9,10 @@ import javax.validation.constraints.NotEmpty;
 @Data
 public class UserDto {
     private long id;
-    @NotEmpty(groups = Class.class)
+    @NotEmpty(groups = {Create.class})
     private String name;
-    @NotEmpty(groups = Create.class)
-    @Email
+    @Email(groups = {Create.class})
+    @NotEmpty(groups = {Create.class})
     private String email;
 
     public UserDto(long id, String name, String email) {
