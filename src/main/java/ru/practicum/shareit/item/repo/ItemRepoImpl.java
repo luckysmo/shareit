@@ -8,14 +8,15 @@ import ru.practicum.shareit.item.Item;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @Repository
-public class ItemRepoImpl {
+public class ItemRepoImpl implements ItemRepo {
 
     private static long idCounter = 0;
-    private final HashMap<Long, Item> items = new HashMap<>();
+    private final Map<Long, Item> items = new HashMap<>();
 
     private void setIdCounter(Item item) {
         ++idCounter;

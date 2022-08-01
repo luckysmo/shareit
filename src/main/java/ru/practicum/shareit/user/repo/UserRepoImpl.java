@@ -8,6 +8,7 @@ import ru.practicum.shareit.user.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -15,7 +16,7 @@ import java.util.Optional;
 public class UserRepoImpl implements UserRepo {
 
     private static long idCounter = 0;
-    private final HashMap<Long, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
 
     private void setIdCounter(User user) {
         ++idCounter;

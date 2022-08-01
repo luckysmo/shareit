@@ -1,12 +1,13 @@
 package ru.practicum.shareit.requests;
 
-import org.springframework.stereotype.Service;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 
-@Service
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestsMapper {
 
-    public ItemRequest mapToUser(ItemRequestDto itemRequestDto) {
+    public static ItemRequest mapToUser(ItemRequestDto itemRequestDto) {
         return new ItemRequest(
                 itemRequestDto.getId(),
                 itemRequestDto.getDescription(),
@@ -15,7 +16,7 @@ public class RequestsMapper {
         );
     }
 
-    public ItemRequestDto mapToItemDto(ItemRequest itemRequest) {
+    public static ItemRequestDto mapToItemDto(ItemRequest itemRequest) {
         return new ItemRequestDto(
                 itemRequest.getId(),
                 itemRequest.getDescription(),

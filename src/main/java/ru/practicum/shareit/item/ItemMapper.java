@@ -1,9 +1,10 @@
 package ru.practicum.shareit.item;
 
+import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.ItemDto;
 
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
 
     public static Item mapToItem(ItemDto itemDto) {
@@ -24,7 +25,7 @@ public class ItemMapper {
                 item.getDescription(),
                 item.getAvailable(),
                 item.getOwner(),
-                item.getRequest()
+                item.getRequest() != null ? item.getRequest() : null
         );
     }
 }

@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.Create;
+import ru.practicum.shareit.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Validated
@@ -26,8 +27,8 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto addUser(@Valid @RequestBody User user) {
-        return userService.addNewUser(user);
+    public UserDto addUser(@Validated(Create.class) @RequestBody UserDto userDto) {
+        return userService.addNewUser(userDto);
     }
 
     @GetMapping("/{userId}")
@@ -42,8 +43,8 @@ public class UserController {
 
     @PatchMapping(value = "/{userID}")
     public UserDto patch(@PathVariable long userID,
-                         @RequestBody User user) {
-        return userService.update(userID, user);
+                         @Validated(Update.class) @RequestBody UserDto userDto) {
+        return userService.update(userID, userDto);
     }
 
     @DeleteMapping("/{userID}")

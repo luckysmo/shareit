@@ -1,33 +1,35 @@
 package ru.practicum.shareit.item.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repo.ItemRepoImpl;
 import ru.practicum.shareit.user.repo.UserRepoImpl;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import static ru.practicum.shareit.item.ItemMapper.mapToItem;
 import static ru.practicum.shareit.item.ItemMapper.mapToItemDto;
 
-@Validated
 @Service
 public class ItemServiceImpl implements ItemService {
     private final ItemRepoImpl itemRepo;
     private final UserRepoImpl userRepo;
+
 
     public ItemServiceImpl(ItemRepoImpl itemRepo, UserRepoImpl userRepo) {
         this.itemRepo = itemRepo;
         this.userRepo = userRepo;
     }
 
-    public ItemDto addNewItem(long userId, @Valid Item item) {
+    public ItemDto addNewItem(long userId, ItemDto itemDto) {
         if (userRepo.isExist(userId)) {
+            Item item = ItemMapper.mapToItem(itemDto);
             itemRepo.add(item);
             item.setOwner(userRepo.getById(userId).orElseThrow());
             return mapToItemDto(item);
@@ -41,9 +43,10 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Item not found!!!")));
     }
 
-    public ItemDto update(long itemId, long userId, Item item) {
+    public ItemDto update(long itemId, long userId, ItemDto itemDto) {
         Item itemExisted = itemRepo.getById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
+        Item item = mapToItem(itemDto);
         if (itemExisted.getOwner().getId() == userId) {
             if (item.getId() == null) {
                 item.setId(itemExisted.getId());
@@ -93,7 +96,7 @@ public class ItemServiceImpl implements ItemService {
             }
             return result;
         } else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 }

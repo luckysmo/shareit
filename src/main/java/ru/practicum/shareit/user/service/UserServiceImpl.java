@@ -4,22 +4,25 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.repo.UserRepo;
 import ru.practicum.shareit.user.repo.UserRepoImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.practicum.shareit.user.UserMapper.mapToUser;
 import static ru.practicum.shareit.user.UserMapper.mapToUserDto;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final UserRepoImpl userRepo;
+    private final UserRepo userRepo;
 
     public UserServiceImpl(UserRepoImpl userRepo) {
         this.userRepo = userRepo;
     }
 
-    public UserDto addNewUser(User user) {
+    public UserDto addNewUser(UserDto userDto) {
+        User user = mapToUser(userDto);
         if (userRepo.isExistEmail(user)) {
             userRepo.add(user);
             return mapToUserDto(user);
@@ -33,8 +36,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException("User not found!!!")));
     }
 
-    public UserDto update(long userID, User user) {
+    public UserDto update(long userID, UserDto userDto) {
         User userExisting = userRepo.getById(userID).orElseThrow(() -> new NotFoundException("User not found!!!"));
+        User user = mapToUser(userDto);
         if (userRepo.isExist(userID)) {
             user.setId(userID);
             if (user.getEmail() == null) {
