@@ -99,29 +99,6 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemDto> getAllItemsOfOneUser(long userId) {
-        List<ItemDto> result = new ArrayList<>();
-        List<Booking> bookings = bookingRepository.findBookingByItem_OwnerId(userId);
-        if (userRepo.existsById(userId)) {
-            List<Item> allItemsOfOneUser = itemRepo.findItemsByOwnerIdOrderById(userId);
-            for (Item item : allItemsOfOneUser) {
-                List<Comment> comments = new ArrayList<>();
-                try {
-                    comments = commentRepository.findCommentByItem_Id(item.getId());
-                } catch (InvalidDataAccessResourceUsageException ex) {
-                    new ArrayList<>();
-                }
-                List<CommentDto> commentsDto = mapToListCommentsDto(comments);
-                result.add(mapToItemDto(item, createLastBooker(bookings, item.getId()),
-                        createNextBooker(bookings, item.getId()), commentsDto));
-            }
-            return result;
-        } else {
-            throw new NotFoundException("User with id " + userId + " not found!");
-        }
-    }
-
-    @Transactional(readOnly = true)
     public List<ItemDtoForCreate> searchItem(String text) {
         List<ItemDtoForCreate> result = new ArrayList<>();
         if (!text.isBlank()) {
@@ -186,5 +163,23 @@ public class ItemService {
             }
         }
         return mapToCommentDto(commentRepository.save(comment));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ItemDto> getAllItemsOfOneUser(long userId) {
+        List<ItemDto> result = new ArrayList<>();
+        List<Booking> bookings = bookingRepository.findBookingByItem_OwnerId(userId);
+        if (userRepo.existsById(userId)) {
+            List<Item> allItemsOfOneUser = itemRepo.findItemsByOwnerIdOrderById(userId);
+            for (Item item : allItemsOfOneUser) {
+                List<Comment> comments = commentRepository.findCommentByItem_Id(item.getId());
+                List<CommentDto> commentsDto = mapToListCommentsDto(comments);
+                result.add(mapToItemDto(item, createLastBooker(bookings, item.getId()),
+                        createNextBooker(bookings, item.getId()), commentsDto));
+            }
+            return result;
+        } else {
+            throw new NotFoundException("User with id " + userId + " not found!");
+        }
     }
 }
