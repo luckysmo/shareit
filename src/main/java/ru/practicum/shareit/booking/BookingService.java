@@ -101,7 +101,6 @@ public class BookingService {
         }
         return extractedFromListBookingsAndMapToListBookingDto(
                 bookingRepository.findBookingByBookerIdOrderByStartDesc(userId));
-
     }
 
     @Transactional(readOnly = true)
@@ -116,26 +115,38 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<BookingDtoWithTime> getBookingCurrentUser(State state, Long userId) {
-        List<BookingDtoWithTime> result;
+        List<BookingDtoWithTime> result = new ArrayList<>();
         if (state == null) {
             state = ALL;
         }
-        result = switch (state) {
-            case ALL -> getAllForUser(userId);
-            case PAST -> extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()));
-            case WAITING -> extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findBookingByBookerIdAndStatusOrderByStartDesc(userId, WAITING));
-            case REJECTED -> extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findBookingByBookerIdAndStatusOrderByStartDesc(userId, REJECTED));
-            case FUTURE -> extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()));
-            case CURRENT -> extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findBookingByBooker_IdAndStartIsBeforeAndEndIsAfter(
-                            userId,
-                            LocalDateTime.now(),
-                            LocalDateTime.now()));
-        };
+        switch (state) {
+            case ALL:
+                result = getAllForUser(userId);
+                break;
+            case PAST:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()));
+                break;
+            case WAITING:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findBookingByBookerIdAndStatusOrderByStartDesc(userId, WAITING));
+                break;
+            case REJECTED:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findBookingByBookerIdAndStatusOrderByStartDesc(userId, REJECTED));
+                break;
+            case FUTURE:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()));
+                break;
+            case CURRENT:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findBookingByBooker_IdAndStartIsBeforeAndEndIsAfter(
+                                userId,
+                                LocalDateTime.now(),
+                                LocalDateTime.now()));
+                break;
+        }
         return result;
     }
 
@@ -146,25 +157,35 @@ public class BookingService {
             state = ALL;
         }
         switch (state) {
-            case ALL -> result = getAllForOwner(ownerId);
-            case PAST -> result = extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findByItem_OwnerIdAndEndIsBeforeOrderByStartDesc(
-                            ownerId,
-                            LocalDateTime.now()));
-            case WAITING -> result = extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findBookingByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, WAITING));
-            case REJECTED -> result = extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findBookingByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, REJECTED));
-            case FUTURE -> {
+            case ALL:
+                result = getAllForOwner(ownerId);
+                break;
+            case PAST:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findByItem_OwnerIdAndEndIsBeforeOrderByStartDesc(
+                                ownerId,
+                                LocalDateTime.now()));
+                break;
+            case WAITING:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findBookingByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, WAITING));
+                break;
+            case REJECTED:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findBookingByItem_OwnerIdAndStatusOrderByStartDesc(ownerId, REJECTED));
+                break;
+            case FUTURE:
                 LocalDateTime time = LocalDateTime.now();
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByItem_OwnerIdAndStartIsAfterOrderByStartDesc(ownerId, time));
-            }
-            case CURRENT -> result = extractedFromListBookingsAndMapToListBookingDto(
-                    bookingRepository.findBookingByItem_OwnerIdAndStartIsBeforeAndEndIsAfter(
-                            ownerId,
-                            LocalDateTime.now(),
-                            LocalDateTime.now()));
+                break;
+            case CURRENT:
+                result = extractedFromListBookingsAndMapToListBookingDto(
+                        bookingRepository.findBookingByItem_OwnerIdAndStartIsBeforeAndEndIsAfter(
+                                ownerId,
+                                LocalDateTime.now(),
+                                LocalDateTime.now()));
+                break;
         }
         return result;
     }
