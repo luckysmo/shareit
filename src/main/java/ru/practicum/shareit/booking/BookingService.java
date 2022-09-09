@@ -44,7 +44,7 @@ public class BookingService {
         if (bookerId.equals(itemBooking.getOwnerId())) {
             throw new NotFoundException("Owner can't booking his item!!!");
         }
-        if(!userRepository.existsById(bookerId)){
+        if (!userRepository.existsById(bookerId)) {
             throw new NotFoundException("User not found!!!");
         }
         if (itemBooking.getAvailable()) {
