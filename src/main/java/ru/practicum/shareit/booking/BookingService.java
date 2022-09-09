@@ -44,9 +44,18 @@ public class BookingService {
         if (bookerId.equals(itemBooking.getOwnerId())) {
             throw new NotFoundException("Owner can't booking his item!!!");
         }
+        if(!userRepository.existsById(bookerId)){
+            throw new NotFoundException("User not found!!!");
+        }
         if (itemBooking.getAvailable()) {
             if (bookingDto.getStart().isBefore(LocalDateTime.now())) {
                 throw new ValidationException("The time is in the past!!!");
+            }
+            if (bookingDto.getEnd().isBefore(LocalDateTime.now())) {
+                throw new ValidationException("The time is in the past!!!");
+            }
+            if (bookingDto.getStart().isAfter(bookingDto.getEnd())) {
+                throw new ValidationException("Start is after end!!!");
             }
             User booker = userRepository.findById(bookerId)
                     .orElseThrow(() -> new NotFoundException("User not found!!!"));
