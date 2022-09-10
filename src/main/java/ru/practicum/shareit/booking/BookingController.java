@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoForCreated;
 import ru.practicum.shareit.booking.dto.BookingDtoWithTime;
 import ru.practicum.shareit.booking.enums.State;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -25,15 +26,15 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingDtoWithTime createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                            @RequestBody BookingDto bookingDto) {
+    public BookingDtoForCreated createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                              @RequestBody @Valid BookingDtoForCreated bookingDto) {
         return bookingService.createBooking(userId, bookingDto);
     }
 
     @PatchMapping(value = "/{bookingId}")
     public BookingDtoWithTime updateBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                               @PathVariable Long bookingId,
-                                               @RequestParam boolean approved) {
+                                            @PathVariable Long bookingId,
+                                            @RequestParam boolean approved) {
         return bookingService.approved(userId, bookingId, approved);
     }
 
@@ -44,13 +45,13 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDtoWithTime> getBookingCurrentUser(@RequestParam(required = false) State state,
-                                                         @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
+    public List<BookingDtoWithTime> getBookingCurrentUser(@RequestParam(required = false, defaultValue = "ALL") State state,
+                                                          @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         return bookingService.getBookingCurrentUser(state, userId);
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoWithTime> getAllForOwner(@RequestParam(required = false) State state,
+    public List<BookingDtoWithTime> getAllForOwner(@RequestParam(required = false, defaultValue = "ALL") State state,
                                                    @RequestHeader(value = "X-Sharer-User-Id") Long userId) {
         return bookingService.getBookingByOwner(state, userId);
     }

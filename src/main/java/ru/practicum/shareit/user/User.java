@@ -27,8 +27,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
-    @Column(name = "email", length = 512)
+    @Column(name = "email", length = 512, nullable = false)
     private String email;
 
     @Override

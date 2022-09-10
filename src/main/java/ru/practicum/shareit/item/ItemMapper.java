@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -18,8 +19,8 @@ public class ItemMapper {
                 itemDtoForCreate.getName(),
                 itemDtoForCreate.getDescription(),
                 itemDtoForCreate.getAvailable(),
-                itemDtoForCreate.getOwnerId(),
-                itemDtoForCreate.getRequestId()
+                null,
+                null
         );
     }
 
@@ -29,9 +30,7 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getAvailable(),
-                item.getOwnerId(),
-                item.getRequestId() != null ? item.getRequestId() : null
+                item.getAvailable()
         );
     }
 
@@ -49,5 +48,13 @@ public class ItemMapper {
                 next,
                 comments
         );
+    }
+
+    public static List<ItemDtoForCreate> mapToListItemDtoForCreate(List<Item> items) {
+        List<ItemDtoForCreate> result = new ArrayList<>();
+        for (Item item : items) {
+            result.add(mapToItemDtoForCreate(item));
+        }
+        return result;
     }
 }

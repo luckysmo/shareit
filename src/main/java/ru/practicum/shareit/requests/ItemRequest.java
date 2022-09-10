@@ -28,7 +28,7 @@ public class ItemRequest {
     private String description;
     @Column(name = "requestor_id")
     private Long requesterId;
-    private LocalDateTime created;
+    private LocalDateTime created = LocalDateTime.now();
 
     @Override
     public boolean equals(Object o) {

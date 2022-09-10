@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -16,6 +15,7 @@ import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static ru.practicum.shareit.item.CommentMapper.mapToCommentDto;
@@ -23,45 +23,42 @@ import static ru.practicum.shareit.item.CommentMapper.mapToListCommentsDto;
 import static ru.practicum.shareit.item.ItemMapper.mapToItem;
 import static ru.practicum.shareit.item.ItemMapper.mapToItemDto;
 import static ru.practicum.shareit.item.ItemMapper.mapToItemDtoForCreate;
+import static ru.practicum.shareit.item.ItemMapper.mapToListItemDtoForCreate;
 
+@Transactional(readOnly = true)
 @Service
 public class ItemService {
-    private final ItemRepository itemRepo;
-    private final UserRepository userRepo;
+    private final ItemRepository itemRepository;
+    private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
 
-    public ItemService(ItemRepository itemRepo,
-                       UserRepository userRepo,
+    public ItemService(ItemRepository itemRepository,
+                       UserRepository userRepository,
                        BookingRepository bookingRepository,
                        CommentRepository commentRepository) {
-        this.itemRepo = itemRepo;
-        this.userRepo = userRepo;
+        this.itemRepository = itemRepository;
+        this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
     }
 
+    @Transactional
     public ItemDtoForCreate addNewItem(long userId, ItemDtoForCreate itemDtoForCreate) {
-        if (userRepo.existsById(userId)) {
+        if (userRepository.existsById(userId)) {
             Item item = ItemMapper.mapToItem(itemDtoForCreate);
-            item.setOwnerId(userRepo.findById(userId).orElseThrow().getId());
-            itemRepo.save(item);
+            item.setOwnerId(userRepository.findById(userId).orElseThrow().getId());
+            itemRepository.save(item);
             return mapToItemDtoForCreate(item);
         } else {
             throw new NotFoundException("User with id " + userId + " not found!");
         }
     }
 
-    @Transactional(readOnly = true)
     public ItemDto getById(long itemId, long ownerId) {
-        Item item = itemRepo.findById(itemId)
+        Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
-        List<Comment> comments = new ArrayList<>();
-        try {
-            comments = commentRepository.findCommentByItem_Id(itemId);
-        } catch (InvalidDataAccessResourceUsageException e) {
-            new ArrayList<>();
-        }
+        List<Comment> comments = commentRepository.findCommentByItem_Id(itemId);
         List<CommentDto> commentsDto = mapToListCommentsDto(comments);
         if (ownerId == item.getOwnerId()) {
             List<Booking> bookings = bookingRepository.findBookingByItem_Id(itemId);
@@ -73,41 +70,38 @@ public class ItemService {
 
     @Transactional
     public ItemDtoForCreate update(long itemId, long userId, ItemDtoForCreate itemDtoForCreate) {
-        Item itemExisted = itemRepo.findById(itemId)
+        Item itemExisted = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
         Item item = mapToItem(itemDtoForCreate);
         if (itemExisted.getOwnerId() == userId) {
             if (item.getId() == null) {
                 item.setId(itemExisted.getId());
             }
-            if (item.getName() == null) {
-                item.setName(itemExisted.getName());
+            if (item.getName() != null) {
+                itemExisted.setName(item.getName());
             }
-            if (item.getDescription() == null) {
-                item.setDescription(itemExisted.getDescription());
+            if (item.getDescription() != null) {
+                itemExisted.setDescription(item.getDescription());
             }
-            if (item.getOwnerId() == null) {
-                item.setOwnerId(itemExisted.getOwnerId());
+            if (item.getOwnerId() != null) {
+                itemExisted.setOwnerId(item.getOwnerId());
             }
-            if (item.getAvailable() == null) {
-                item.setAvailable(itemExisted.getAvailable());
+            if (item.getAvailable() != null) {
+                itemExisted.setAvailable(item.getAvailable());
             }
-            return mapToItemDtoForCreate(itemRepo.save(item));
+            return mapToItemDtoForCreate(itemExisted);
         } else {
             throw new NotFoundException("User don't have this item");
         }
     }
 
-    @Transactional(readOnly = true)
     public List<ItemDtoForCreate> searchItem(String text) {
-        List<ItemDtoForCreate> result = new ArrayList<>();
+        List<ItemDtoForCreate> result;
         if (!text.isBlank()) {
-            List<Item> itemsByNameOrDescriptionLikeIgnoreCase = itemRepo.search(text);
-            for (Item item : itemsByNameOrDescriptionLikeIgnoreCase) {
-                result.add(mapToItemDtoForCreate(item));
-            }
+            List<Item> itemsByNameOrDescriptionLikeIgnoreCase = itemRepository.search(text);
+            result = mapToListItemDtoForCreate(itemsByNameOrDescriptionLikeIgnoreCase);
         } else {
-            result = new ArrayList<>();
+            result = Collections.emptyList();
         }
         return result;
     }
@@ -153,8 +147,8 @@ public class ItemService {
         List<Booking> bookings = bookingRepository.findBookingByBooker_IdAndItem_Id(userId, itemId);
         for (Booking booking : bookings) {
             if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                Item item = itemRepo.findById(itemId).orElseThrow();
-                User author = userRepo.findById(userId).orElseThrow();
+                Item item = itemRepository.findById(itemId).orElseThrow();
+                User author = userRepository.findById(userId).orElseThrow();
                 comment.setItem(item);
                 comment.setAuthor(author);
                 break;
@@ -165,12 +159,11 @@ public class ItemService {
         return mapToCommentDto(commentRepository.save(comment));
     }
 
-    @Transactional(readOnly = true)
     public List<ItemDto> getAllItemsOfOneUser(long userId) {
         List<ItemDto> result = new ArrayList<>();
         List<Booking> bookings = bookingRepository.findBookingByItem_OwnerId(userId);
-        if (userRepo.existsById(userId)) {
-            List<Item> allItemsOfOneUser = itemRepo.findItemsByOwnerIdOrderById(userId);
+        if (userRepository.existsById(userId)) {
+            List<Item> allItemsOfOneUser = itemRepository.findItemsByOwnerIdOrderById(userId);
             for (Item item : allItemsOfOneUser) {
                 List<Comment> comments = commentRepository.findCommentByItem_Id(item.getId());
                 List<CommentDto> commentsDto = mapToListCommentsDto(comments);

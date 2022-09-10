@@ -12,6 +12,7 @@ import java.util.Optional;
 import static ru.practicum.shareit.user.UserMapper.mapToUser;
 import static ru.practicum.shareit.user.UserMapper.mapToUserDto;
 
+@Transactional(readOnly = true)
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService {
@@ -25,7 +26,6 @@ public class UserServiceImpl implements UserService {
         return mapToUserDto(repository.save(mapToUser(userDto)));
     }
 
-    @Transactional(readOnly = true)
     public Optional<User> getById(long userId) {
         User user = repository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!!!"));
         return Optional.of(user);
@@ -37,17 +37,13 @@ public class UserServiceImpl implements UserService {
         User user = mapToUser(userDto);
         if (repository.existsById(userID)) {
             user.setId(userID);
-            if (user.getEmail() == null) {
-                user.setEmail(userExisting.getEmail());
+            if (user.getEmail() != null) {
+                userExisting.setEmail(user.getEmail());
             }
-            if (user.getName() == null) {
-                if (repository.findUserByEmail(user.getEmail()) == null) {
-                    user.setName(userExisting.getName());
-                } else {
-                    throw new IllegalArgumentException("Email exists!!!");
-                }
+            if (user.getName() != null) {
+                userExisting.setName(user.getName());
             }
-            return mapToUserDto(repository.save(user));
+            return mapToUserDto(userExisting);
         } else {
             throw new NotFoundException("User not found!!!");
         }
@@ -63,7 +59,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Transactional(readOnly = true)
     public List<UserDto> getAll() {
         List<UserDto> result = new ArrayList<>();
         for (User user : repository.findAll()) {
