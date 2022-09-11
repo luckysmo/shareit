@@ -2,7 +2,6 @@ package ru.practicum.shareit.requests;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.requests.dto.ItemRequestDto;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestsMapper {
@@ -11,7 +10,7 @@ public class RequestsMapper {
         return new ItemRequest(
                 itemRequestDto.getId(),
                 itemRequestDto.getDescription(),
-                itemRequestDto.getRequester(),
+                itemRequestDto.getRequesterId(),
                 itemRequestDto.getCreated()
         );
     }
@@ -20,7 +19,7 @@ public class RequestsMapper {
         return new ItemRequestDto(
                 itemRequest.getId(),
                 itemRequest.getDescription(),
-                itemRequest.getRequester(),
+                itemRequest.getRequesterId(),
                 itemRequest.getCreated()
         );
     }

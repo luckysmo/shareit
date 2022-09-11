@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.Create;
 import ru.practicum.shareit.Update;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 @Validated
 @RequestMapping("/users")
@@ -32,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable long userId) {
+    public Optional<User> getUserById(@PathVariable long userId) {
         return userService.getById(userId);
     }
 
