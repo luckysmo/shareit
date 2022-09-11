@@ -7,8 +7,8 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
@@ -51,10 +51,8 @@ public class ItemMapper {
     }
 
     public static List<ItemDtoForCreate> mapToListItemDtoForCreate(List<Item> items) {
-        List<ItemDtoForCreate> result = new ArrayList<>();
-        for (Item item : items) {
-            result.add(mapToItemDtoForCreate(item));
-        }
-        return result;
+        return items.stream()
+                .map(ItemMapper::mapToItemDtoForCreate)
+                .collect(Collectors.toList());
     }
 }
