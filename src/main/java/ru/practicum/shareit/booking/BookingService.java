@@ -31,7 +31,9 @@ public class BookingService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
 
-    public BookingService(BookingRepository bookingRepository, ItemRepository itemRepository, UserRepository userRepository) {
+    public BookingService(BookingRepository bookingRepository,
+                          ItemRepository itemRepository,
+                          UserRepository userRepository) {
         this.bookingRepository = bookingRepository;
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
@@ -39,7 +41,8 @@ public class BookingService {
 
     @Transactional
     public BookingDtoForCreated createBooking(Long bookerId, BookingDtoForCreated bookingDto) {
-        Item itemBooking = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() -> new NotFoundException("Item not found!!!"));
+        Item itemBooking = itemRepository.findById(bookingDto.getItemId())
+                .orElseThrow(() -> new NotFoundException("Item not found!!!"));
         if (bookerId.equals(itemBooking.getOwnerId())) {
             throw new NotFoundException("Owner can't booking his item!!!");
         }
@@ -53,7 +56,8 @@ public class BookingService {
             if (bookingDto.getStart().equals(bookingDto.getEnd())) {
                 throw new ValidationException("Start cannot be equal to end!!!");
             }
-            User booker = userRepository.findById(bookerId).orElseThrow(() -> new NotFoundException("User not found!!!"));
+            User booker = userRepository.findById(bookerId)
+                    .orElseThrow(() -> new NotFoundException("User not found!!!"));
             Booking booking = mapToBooking(bookingDto, itemBooking, booker);
             booking.setStatus(WAITING);
             return mapToBookingDtoForCreated(bookingRepository.save(booking));

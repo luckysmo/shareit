@@ -5,12 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import ru.practicum.shareit.user.User;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -26,9 +29,11 @@ public class ItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String description;
-    @Column(name = "requestor_id")
-    private Long requesterId;
-    private LocalDateTime created = LocalDateTime.now();
+    @ManyToOne
+    @JoinColumn(name = "requestor_id")
+    private User requester;
+    @Column(name = "created")
+    private LocalDateTime created;
 
     @Override
     public boolean equals(Object o) {
