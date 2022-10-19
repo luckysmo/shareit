@@ -9,7 +9,7 @@ import ru.practicum.shareit.requests.dto.ItemRequestDtoWithItems;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RequestsMapper {
+public class ItemRequestsMapper {
 
     public static ItemRequest mapToItemRequest(ItemRequestDto itemRequestDto) {
         return new ItemRequest(

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -47,7 +49,7 @@ public class ItemService {
     public ItemDtoForCreate addNewItem(long userId, ItemDtoForCreate itemDtoForCreate) {
         if (userRepository.existsById(userId)) {
             Item item = ItemMapper.mapToItem(itemDtoForCreate);
-            item.setOwnerId(userRepository.findById(userId).orElseThrow().getId());
+            item.setOwner(userRepository.findById(userId).orElseThrow());
             itemRepository.save(item);
             return mapToItemDtoForCreate(item);
         } else {
@@ -60,7 +62,7 @@ public class ItemService {
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
         List<Comment> comments = commentRepository.findCommentByItem_Id(itemId);
         List<CommentDto> commentsDto = mapToListCommentsDto(comments);
-        if (ownerId == item.getOwnerId()) {
+        if (ownerId == item.getOwner().getId()) {
             List<Booking> bookings = bookingRepository.findBookingByItem_Id(itemId);
             return mapToItemDto(item, createLastBooker(bookings, itemId), createNextBooker(bookings, itemId), commentsDto);
         } else {
@@ -73,7 +75,7 @@ public class ItemService {
         Item itemExisted = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
         Item item = mapToItem(itemDtoForCreate);
-        if (itemExisted.getOwnerId() == userId) {
+        if (itemExisted.getOwner().getId() == userId) {
             if (item.getId() == null) {
                 item.setId(itemExisted.getId());
             }
@@ -83,8 +85,8 @@ public class ItemService {
             if (item.getDescription() != null) {
                 itemExisted.setDescription(item.getDescription());
             }
-            if (item.getOwnerId() != null) {
-                itemExisted.setOwnerId(item.getOwnerId());
+            if (item.getOwner() != null) {
+                itemExisted.setOwner(item.getOwner());
             }
             if (item.getAvailable() != null) {
                 itemExisted.setAvailable(item.getAvailable());
@@ -95,10 +97,12 @@ public class ItemService {
         }
     }
 
-    public List<ItemDtoForCreate> searchItem(String text) {
+    public List<ItemDtoForCreate> searchItem(String text, Integer from, Integer size) {
+        int page = from < size ? 0 : from / size;
+        Pageable pageable = PageRequest.of(page, size);
         List<ItemDtoForCreate> result;
         if (!text.isBlank()) {
-            List<Item> itemsByNameOrDescriptionLikeIgnoreCase = itemRepository.search(text);
+            List<Item> itemsByNameOrDescriptionLikeIgnoreCase = itemRepository.search(text, pageable);
             result = mapToListItemDtoForCreate(itemsByNameOrDescriptionLikeIgnoreCase);
         } else {
             result = Collections.emptyList();
@@ -159,11 +163,14 @@ public class ItemService {
         return mapToCommentDto(commentRepository.save(comment));
     }
 
-    public List<ItemDto> getAllItemsOfOneUser(long userId) {
+    public List<ItemDto> getAllItemsOfOneUser(long userId, Integer from, Integer size) {
+        int page = from < size ? 0 : from / size;
+        Pageable pageable = PageRequest.of(page, size);
         List<ItemDto> result = new ArrayList<>();
         List<Booking> bookings = bookingRepository.findBookingByItem_OwnerId(userId);
+
         if (userRepository.existsById(userId)) {
-            List<Item> allItemsOfOneUser = itemRepository.findItemsByOwnerIdOrderById(userId);
+            List<Item> allItemsOfOneUser = itemRepository.findItemsByOwnerIdOrderById(userId, pageable);
             for (Item item : allItemsOfOneUser) {
                 List<Comment> comments = commentRepository.findCommentByItem_Id(item.getId());
                 List<CommentDto> commentsDto = mapToListCommentsDto(comments);

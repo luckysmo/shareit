@@ -18,9 +18,12 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
@@ -45,8 +48,12 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDto> getAllItemsOfOneUser(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getAllItemsOfOneUser(userId);
+    public List<ItemDto> getAllItemsOfOneUser(@RequestParam(required = false, defaultValue = "0")
+                                              @PositiveOrZero Integer from,
+                                              @RequestParam(required = false, defaultValue = "20")
+                                              @Positive Integer size,
+                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemService.getAllItemsOfOneUser(userId, from, size);
     }
 
     @GetMapping("{itemId}")
@@ -56,8 +63,12 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDtoForCreate> search(@RequestParam(name = "text") String text) {
-        return itemService.searchItem(text);
+    public List<ItemDtoForCreate> search(@RequestParam(required = false, defaultValue = "0")
+                                         @PositiveOrZero Integer from,
+                                         @RequestParam(required = false, defaultValue = "20")
+                                         @Positive Integer size,
+                                         @RequestParam(name = "text") String text) {
+        return itemService.searchItem(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
@@ -67,3 +78,5 @@ public class ItemController {
         return itemService.createComment(itemId, userId, comment);
     }
 }
+
+

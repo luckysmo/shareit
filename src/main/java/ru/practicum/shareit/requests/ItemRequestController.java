@@ -42,15 +42,16 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDtoWithItems> getAllRequests(@RequestParam(required = false, defaultValue = "0")
-                                                        @PositiveOrZero long from,
-                                                        @RequestParam(required = false, defaultValue = "1")
-                                                        @Positive long size) {
-        return itemRequestService.getAllRequests(from, size);
+                                                        @PositiveOrZero Integer from,
+                                                        @RequestParam(required = false, defaultValue = "20")
+                                                        @Positive Integer size,
+                                                        @RequestHeader("X-Sharer-User-Id") Long userId) {
+        return itemRequestService.getAllRequests(from, size, userId);
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestDto getRequest(@PathVariable @PositiveOrZero long requestId,
-                                     @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ItemRequestDtoWithItems getRequest(@PathVariable @PositiveOrZero long requestId,
+                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemRequestService.getRequestById(requestId, userId);
     }
 }

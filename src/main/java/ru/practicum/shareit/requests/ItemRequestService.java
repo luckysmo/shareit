@@ -1,5 +1,7 @@
 package ru.practicum.shareit.requests;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,9 +19,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.requests.RequestsMapper.mapToItemRequest;
-import static ru.practicum.shareit.requests.RequestsMapper.mapToItemRequestDto;
-import static ru.practicum.shareit.requests.RequestsMapper.mapToItemRequestDtoWithItems;
+import static ru.practicum.shareit.requests.ItemRequestsMapper.mapToItemRequest;
+import static ru.practicum.shareit.requests.ItemRequestsMapper.mapToItemRequestDto;
+import static ru.practicum.shareit.requests.ItemRequestsMapper.mapToItemRequestDtoWithItems;
 
 @Service
 public class ItemRequestService {
@@ -50,14 +52,11 @@ public class ItemRequestService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(String.format("User with id %d not found!!!", userId));
         }
-
         return itemRequestRepository.getItemRequestByRequester_Id(userId,
                         Sort.by(Sort.Direction.DESC, "created")).stream()
                 .map(itemRequest -> mapToItemRequestDtoWithItems(itemRequest,
                         getItemsByRequestId(itemRequest.getId())))
                 .collect(Collectors.toList());
-
-
     }
 
     private List<ItemDtoForCreate> getItemsByRequestId(long requestId) {
@@ -68,22 +67,25 @@ public class ItemRequestService {
                 .collect(Collectors.toList());
     }
 
-    public List<ItemRequestDtoWithItems> getAllRequests(Long from, Long size) {
-        return itemRequestRepository.findAll().stream()
-                .skip(from)
-                .limit(size)
-                .map(itemRequest -> mapToItemRequestDtoWithItems(itemRequest,
-                        getItemsByRequestId(itemRequest.getId())))
+    public List<ItemRequestDtoWithItems> getAllRequests(Integer from, Integer size, Long userId) {
+        int page = from < size ? 0 : from / size;
+        Page<ItemRequest> requests =
+                itemRequestRepository.findAllWithoutUserRequests(
+                        userId,
+                        PageRequest.of(page, size, Sort.by("created").descending())
+                );
+        return requests.stream()
+                .map(r -> mapToItemRequestDtoWithItems(r, getItemsByRequestId(r.getId())))
                 .collect(Collectors.toList());
     }
 
-    public ItemRequestDto getRequestById(long requestId, long userId) {
+    public ItemRequestDtoWithItems getRequestById(long requestId, long userId) {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(String.format("User with id %d not found!!!", userId));
         }
 
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException(String.format("Request with id %d not found!!!", requestId)));
-        return mapToItemRequestDto(itemRequest);
+        return mapToItemRequestDtoWithItems(itemRequest, getItemsByRequestId(itemRequest.getId()));
     }
 }
