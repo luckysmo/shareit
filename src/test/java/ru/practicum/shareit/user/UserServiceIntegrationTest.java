@@ -39,7 +39,7 @@ public class UserServiceIntegrationTest {
     void testGetById() {
         Optional<User> user = Optional.of(mapToUser(userService.addNewUser(userDto)));
 
-        Optional<User> byId = userService.getById(1L);
+        Optional<User> byId = userService.getById(user.get().getId());
 
         assertEquals(user, byId);
     }

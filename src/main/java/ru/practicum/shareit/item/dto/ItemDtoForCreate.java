@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.Create;
-import ru.practicum.shareit.requests.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -22,5 +21,5 @@ public class ItemDtoForCreate {
     private String description;
     @NotNull(groups = Create.class)
     private Boolean available;
-    private ItemRequest request;
+    private Long requestId;
 }

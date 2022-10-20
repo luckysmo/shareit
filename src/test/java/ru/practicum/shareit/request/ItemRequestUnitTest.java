@@ -148,7 +148,7 @@ class ItemRequestUnitTest {
         )
                 .thenReturn(new PageImpl<>(List.of(itemRequest1, itemRequest2, itemRequest3)));
 
-        List<ItemRequestDtoWithItems> allRequests = itemRequestService.getAllRequests(0, 20, 4L);
+        List<ItemRequestDtoWithItems> allRequests = itemRequestService.getAllRequests(4L, 0, 20);
 
         verify(itemRequestRepository, times(1))
                 .findAllWithoutUserRequests(

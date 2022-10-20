@@ -12,6 +12,8 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
+import ru.practicum.shareit.requests.ItemRequest;
+import ru.practicum.shareit.requests.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -34,21 +36,29 @@ public class ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository requestRepository;
 
     public ItemService(ItemRepository itemRepository,
                        UserRepository userRepository,
                        BookingRepository bookingRepository,
-                       CommentRepository commentRepository) {
+                       CommentRepository commentRepository,
+                       ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.requestRepository = itemRequestRepository;
     }
 
     @Transactional
     public ItemDtoForCreate addNewItem(long userId, ItemDtoForCreate itemDtoForCreate) {
         if (userRepository.existsById(userId)) {
             Item item = ItemMapper.mapToItem(itemDtoForCreate);
+            if (itemDtoForCreate.getRequestId() != null) {
+                ItemRequest request = requestRepository.findById(itemDtoForCreate.getRequestId())
+                        .orElseThrow(() -> new NotFoundException("Request not found!!!"));
+                item.setRequest(request);
+            }
             item.setOwner(userRepository.findById(userId).orElseThrow());
             itemRepository.save(item);
             return mapToItemDtoForCreate(item);
@@ -90,6 +100,9 @@ public class ItemService {
             }
             if (item.getAvailable() != null) {
                 itemExisted.setAvailable(item.getAvailable());
+            }
+            if (item.getRequest() != null) {
+                itemExisted.setRequest(item.getRequest());
             }
             return mapToItemDtoForCreate(itemExisted);
         } else {

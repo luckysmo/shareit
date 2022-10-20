@@ -42,7 +42,7 @@ class ItemRequestIntegrationTest {
 
         ItemRequestDto requestDto = service.addRequest(user.getId(), createItemRequestDto(1L));
 
-        ItemRequestDtoWithItems receivedRequestDto = service.getRequestById(requestDto.getId(),user.getId());
+        ItemRequestDtoWithItems receivedRequestDto = service.getRequestById(requestDto.getId(), user.getId());
 
         TypedQuery<ItemRequest> query = entityManager.createQuery(
                 "select r from ItemRequest r where r.id = : id", ItemRequest.class
@@ -118,7 +118,7 @@ class ItemRequestIntegrationTest {
             i++;
         }
 
-        List<ItemRequestDtoWithItems> requestsDto = service.getAllRequests(0, 20, users.get(2).getId());
+        List<ItemRequestDtoWithItems> requestsDto = service.getAllRequests(users.get(2).getId(), 0, 20);
 
         assertThat(requestsDto, hasSize(requestsInputDto.size() - 1));
     }

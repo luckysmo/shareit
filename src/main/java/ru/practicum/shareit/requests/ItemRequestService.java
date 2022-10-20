@@ -39,7 +39,7 @@ public class ItemRequestService {
 
     @Transactional
     public ItemRequestDto addRequest(Long userId, ItemRequestDto itemRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!!!"));
 
         itemRequestDto.setRequester(user);
         itemRequestDto.setCreated(LocalDateTime.now());
@@ -67,7 +67,7 @@ public class ItemRequestService {
                 .collect(Collectors.toList());
     }
 
-    public List<ItemRequestDtoWithItems> getAllRequests(Integer from, Integer size, Long userId) {
+    public List<ItemRequestDtoWithItems> getAllRequests(Long userId, Integer from, Integer size) {
         int page = from < size ? 0 : from / size;
         Page<ItemRequest> requests =
                 itemRequestRepository.findAllWithoutUserRequests(
@@ -83,7 +83,6 @@ public class ItemRequestService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException(String.format("User with id %d not found!!!", userId));
         }
-
         ItemRequest itemRequest = itemRequestRepository.findById(requestId)
                 .orElseThrow(() -> new NotFoundException(String.format("Request with id %d not found!!!", requestId)));
         return mapToItemRequestDtoWithItems(itemRequest, getItemsByRequestId(itemRequest.getId()));

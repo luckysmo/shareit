@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 import ru.practicum.shareit.requests.ItemRequest;
+import ru.practicum.shareit.requests.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -53,6 +54,8 @@ public class ItemUnitTest {
     private UserRepository userRepository;
     @Mock
     private CommentRepository commentRepository;
+    @Mock
+    private ItemRequestRepository itemRequestRepository;
     @InjectMocks
     private ItemService itemService;
 
@@ -115,6 +118,7 @@ public class ItemUnitTest {
                 Optional.of(new User(1L, "name", "email@mail.ru"))
         );
         when(itemRepository.save(any())).thenReturn(createItem(1L));
+        when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.of(itemRequest));
 
         itemService.addNewItem(anyLong(), createItemDtoForCreate(1L));
 
@@ -129,6 +133,7 @@ public class ItemUnitTest {
                 Optional.of(new User(1L, "name", "email@mail.ru"))
         );
         when(itemRepository.save(any())).thenReturn(createItem(1L));
+        when(itemRequestRepository.findById(anyLong())).thenReturn(Optional.of(itemRequest));
 
         ItemDtoForCreate itemDto = itemService.addNewItem(anyLong(), createItemDtoForCreate(1L));
 
@@ -287,7 +292,7 @@ public class ItemUnitTest {
                 "Item" + id,
                 "Description" + id,
                 true,
-                itemRequest
+                itemRequest.getId()
         );
     }
 

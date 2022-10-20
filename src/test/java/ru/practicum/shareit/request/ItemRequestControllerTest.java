@@ -65,7 +65,7 @@ class ItemRequestControllerTest {
     void whenGetAllRequests_thenReturnListOfRequests() throws Exception {
         List<ItemRequestDtoWithItems> requests = createRequestsDtoWithItems();
 
-        when(service.getAllRequests(0, 20, 1L)).thenReturn(requests);
+        when(service.getAllRequests(1L, 0, 20)).thenReturn(requests);
 
         mvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", 1L)

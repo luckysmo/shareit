@@ -46,7 +46,7 @@ public class ItemRequestController {
                                                         @RequestParam(required = false, defaultValue = "20")
                                                         @Positive Integer size,
                                                         @RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemRequestService.getAllRequests(from, size, userId);
+        return itemRequestService.getAllRequests(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
