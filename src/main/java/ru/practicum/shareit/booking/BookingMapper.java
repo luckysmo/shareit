@@ -48,12 +48,14 @@ public class BookingMapper {
         );
     }
 
-    public static BookingDtoForCreated mapToBookingDtoForCreated(Booking booking) {
-        return new BookingDtoForCreated(
+    public static BookingDto mapToBookingDto(Booking booking) {
+        return new BookingDto(
                 booking.getId(),
-                booking.getItem().getId(),
                 booking.getStart(),
-                booking.getEnd()
+                booking.getEnd(),
+                booking.getBooker(),
+                booking.getStatus(),
+                booking.getItem()
         );
     }
 }

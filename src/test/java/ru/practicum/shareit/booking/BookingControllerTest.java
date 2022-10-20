@@ -7,11 +7,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForCreated;
 import ru.practicum.shareit.booking.dto.BookingDtoWithTime;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.enums.State;
+import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 
 import java.nio.charset.StandardCharsets;
@@ -29,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = BookingController.class)
 class BookingControllerTest {
 
-    BookingDtoWithTime bookingDto = new BookingDtoWithTime(
+    BookingDtoWithTime bookingDtoWithTime = new BookingDtoWithTime(
             1L,
             LocalDateTime.now().plusHours(1),
             LocalDateTime.now().plusHours(2),
@@ -37,6 +40,15 @@ class BookingControllerTest {
             new UserDto(1L, "user", "email@mail.ru"),
             new ItemDtoForCreate(),
             "item");
+
+    BookingDto bookingDto = new BookingDto(
+            1L,
+            LocalDateTime.now().plusHours(1),
+            LocalDateTime.now().plusHours(2),
+            new User(1L, "user", "email@mail.ru"),
+            BookingStatus.WAITING,
+            new Item());
+
     @Autowired
     private ObjectMapper mapper;
     @MockBean
@@ -53,7 +65,7 @@ class BookingControllerTest {
                 LocalDateTime.now().plusHours(2));
 
         when(service.createBooking(1L, bookingDtoForCreated))
-                .thenReturn(bookingDtoForCreated);
+                .thenReturn(bookingDto);
 
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(bookingDtoForCreated))
@@ -74,7 +86,7 @@ class BookingControllerTest {
                 LocalDateTime.now().plusHours(2));
 
         when(service.createBooking(1L, bookingDtoForCreated))
-                .thenReturn(bookingDtoForCreated);
+                .thenReturn(bookingDto);
 
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(bookingDtoForCreated))
@@ -94,7 +106,7 @@ class BookingControllerTest {
                 LocalDateTime.now().minusHours(2));
 
         when(service.createBooking(1L, bookingDtoForCreated))
-                .thenReturn(bookingDtoForCreated);
+                .thenReturn(bookingDto);
 
         mvc.perform(post("/bookings")
                         .content(mapper.writeValueAsString(bookingDtoForCreated))
@@ -109,33 +121,33 @@ class BookingControllerTest {
     void testApprovedBooking() throws Exception {
 
         when(service.approved(1L, 1L, true))
-                .thenReturn(bookingDto);
+                .thenReturn(bookingDtoWithTime);
 
-        mvc.perform(patch("/bookings/" + bookingDto.getId())
+        mvc.perform(patch("/bookings/" + bookingDtoWithTime.getId())
                         .param("approved", "true")
                         .header("X-Sharer-User-Id", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.status", is(bookingDto.getStatus()
+                .andExpect(jsonPath("$.id", is(bookingDtoWithTime.getId()), Long.class))
+                .andExpect(jsonPath("$.status", is(bookingDtoWithTime.getStatus()
                         .toString())));
     }
 
     @Test
     void testGetById() throws Exception {
         when(service.getById(1L, 1L))
-                .thenReturn(bookingDto);
+                .thenReturn(bookingDtoWithTime);
 
-        mvc.perform(get("/bookings/" + bookingDto.getId())
+        mvc.perform(get("/bookings/" + bookingDtoWithTime.getId())
                         .header("X-Sharer-User-Id", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(bookingDto.getId()), Long.class))
-                .andExpect(jsonPath("$.status", is(bookingDto.getStatus()
+                .andExpect(jsonPath("$.id", is(bookingDtoWithTime.getId()), Long.class))
+                .andExpect(jsonPath("$.status", is(bookingDtoWithTime.getStatus()
                         .toString())));
     }
 
     @Test
     void testGetBookingOfCurrentUser() throws Exception {
-        List<BookingDtoWithTime> bookings = List.of(bookingDto);
+        List<BookingDtoWithTime> bookings = List.of(bookingDtoWithTime);
 
         when(service.getBookingCurrentUser(State.ALL, 1L, 0, 20))
                 .thenReturn(bookings);
@@ -151,7 +163,7 @@ class BookingControllerTest {
 
     @Test
     void testGetAllForOwner() throws Exception {
-        List<BookingDtoWithTime> bookings = List.of(bookingDto);
+        List<BookingDtoWithTime> bookings = List.of(bookingDtoWithTime);
 
         when(service.getBookingByOwner(State.ALL, 1L, 0, 20))
                 .thenReturn(bookings);

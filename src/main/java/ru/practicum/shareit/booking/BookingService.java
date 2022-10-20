@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForCreated;
 import ru.practicum.shareit.booking.dto.BookingDtoWithTime;
 import ru.practicum.shareit.booking.enums.State;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static ru.practicum.shareit.booking.BookingMapper.mapToBooking;
-import static ru.practicum.shareit.booking.BookingMapper.mapToBookingDtoForCreated;
+import static ru.practicum.shareit.booking.BookingMapper.mapToBookingDto;
 import static ru.practicum.shareit.booking.BookingMapper.mapToBookingDtoWithTime;
 import static ru.practicum.shareit.booking.enums.BookingStatus.APPROVED;
 import static ru.practicum.shareit.booking.enums.BookingStatus.REJECTED;
@@ -44,7 +45,7 @@ public class BookingService {
     }
 
     @Transactional
-    public BookingDtoForCreated createBooking(Long bookerId, BookingDtoForCreated bookingDto) {
+    public BookingDto createBooking(Long bookerId, BookingDtoForCreated bookingDto) {
         Item itemBooking = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
         User booker = userRepository.findById(bookerId)
@@ -61,7 +62,7 @@ public class BookingService {
             }
             Booking booking = mapToBooking(bookingDto, itemBooking, booker);
             booking.setStatus(WAITING);
-            return mapToBookingDtoForCreated(bookingRepository.save(booking));
+            return mapToBookingDto(bookingRepository.save(booking));
         } else {
             throw new ValidationException("Item unavailable!!!");
         }

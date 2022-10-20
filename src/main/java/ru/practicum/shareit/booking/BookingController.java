@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForCreated;
 import ru.practicum.shareit.booking.dto.BookingDtoWithTime;
 import ru.practicum.shareit.booking.enums.State;
@@ -30,8 +31,8 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingDtoForCreated createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                              @RequestBody @Valid BookingDtoForCreated bookingDto) {
+    public BookingDto createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                    @RequestBody @Valid BookingDtoForCreated bookingDto) {
         return bookingService.createBooking(userId, bookingDto);
     }
 
