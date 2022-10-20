@@ -142,38 +142,38 @@ public class BookingService {
             case PAST:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findByBookerIdAndEndIsBefore(
-                        userId,
-                        LocalDateTime.now(),
-                        pageable).toList());
+                                userId,
+                                LocalDateTime.now(),
+                                pageable).toList());
                 break;
             case WAITING:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByBookerIdAndStatus(
-                        userId,
-                        WAITING,
-                        pageable).toList());
+                                userId,
+                                WAITING,
+                                pageable).toList());
                 break;
             case REJECTED:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByBookerIdAndStatus(
-                        userId,
-                        REJECTED,
-                        pageable).toList());
+                                userId,
+                                REJECTED,
+                                pageable).toList());
                 break;
             case FUTURE:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findByBookerIdAndStartIsAfter(
-                        userId,
-                        LocalDateTime.now(),
-                        pageable).toList());
+                                userId,
+                                LocalDateTime.now(),
+                                pageable).toList());
                 break;
             case CURRENT:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByBooker_IdAndStartIsBeforeAndEndIsAfter(
-                        userId,
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        pageable).toList());
+                                userId,
+                                LocalDateTime.now(),
+                                LocalDateTime.now(),
+                                pageable).toList());
                 break;
         }
         return result;
@@ -196,39 +196,39 @@ public class BookingService {
             case PAST:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findByItem_OwnerIdAndEndIsBefore(
-                        ownerId,
-                        LocalDateTime.now(),
-                        pageable).toList());
+                                ownerId,
+                                LocalDateTime.now(),
+                                pageable).toList());
                 break;
             case WAITING:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByItem_OwnerIdAndStatus(
-                        ownerId,
-                        WAITING,
-                        pageable).toList());
+                                ownerId,
+                                WAITING,
+                                pageable).toList());
                 break;
             case REJECTED:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByItem_OwnerIdAndStatus(
-                        ownerId,
-                        REJECTED,
-                        pageable).toList());
+                                ownerId,
+                                REJECTED,
+                                pageable).toList());
                 break;
             case FUTURE:
                 LocalDateTime time = LocalDateTime.now();
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByItem_OwnerIdAndStartIsAfter(
-                        ownerId,
-                        time,
-                        pageable).toList());
+                                ownerId,
+                                time,
+                                pageable).toList());
                 break;
             case CURRENT:
                 result = extractedFromListBookingsAndMapToListBookingDto(
                         bookingRepository.findBookingByItem_OwnerIdAndStartIsBeforeAndEndIsAfter(
-                        ownerId,
-                        LocalDateTime.now(),
-                        LocalDateTime.now(),
-                        pageable).toList());
+                                ownerId,
+                                LocalDateTime.now(),
+                                LocalDateTime.now(),
+                                pageable).toList());
                 break;
         }
         return result;
