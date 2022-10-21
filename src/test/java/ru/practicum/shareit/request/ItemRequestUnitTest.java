@@ -17,6 +17,7 @@ import ru.practicum.shareit.requests.ItemRequestService;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.dto.ItemRequestDtoWithItems;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -166,11 +167,17 @@ class ItemRequestUnitTest {
     }
 
     private ItemRequest createItemRequest(Long id) {
-        return new ItemRequest(id, "description", null, LocalDateTime.now());
+        return new ItemRequest(id,
+                "description",
+                new User(2L,"userDto2","userdto@mail.ru"),
+                LocalDateTime.now());
     }
 
     private ItemRequestDto createItemRequestDto(Long id) {
-        return new ItemRequestDto(id, "description", new User(), LocalDateTime.now());
+        return new ItemRequestDto(id,
+                "description",
+                new UserDto(null,"user", "wop@mail.ru"),
+                LocalDateTime.now());
     }
 
     private Item createItem(Long id) {

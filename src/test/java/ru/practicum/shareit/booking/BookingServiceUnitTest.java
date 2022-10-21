@@ -124,7 +124,7 @@ class BookingServiceUnitTest {
                         LocalDateTime.now().plusHours(2),
                         LocalDateTime.now().plusHours(1))));
 
-        Assertions.assertEquals("Start is after end!!!", validationException.getMessage());
+        Assertions.assertEquals("Incorrect start or end time", validationException.getMessage());
     }
 
     @Test
@@ -144,7 +144,7 @@ class BookingServiceUnitTest {
                         LocalDateTime.now().plusHours(1),
                         LocalDateTime.now().plusHours(1))));
 
-        Assertions.assertEquals("Start cannot be equal to end!!!", validationException.getMessage());
+        Assertions.assertEquals("Incorrect start or end time", validationException.getMessage());
     }
 
     @Test

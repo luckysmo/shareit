@@ -10,6 +10,8 @@ import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.practicum.shareit.requests.ItemRequestsMapper.mapToItemRequestDto;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
 
@@ -44,7 +46,7 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
-                item.getRequest(),
+                item.getRequest() != null ? mapToItemRequestDto(item.getRequest()) : null,
                 last,
                 next,
                 comments

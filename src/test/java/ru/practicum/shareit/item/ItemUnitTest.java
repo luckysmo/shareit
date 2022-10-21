@@ -253,31 +253,36 @@ public class ItemUnitTest {
     void whenCreateComment_thenCallCommentRepositorySave() {
         User user1 = createUser(1L);
         Item item1 = createItem(1L);
-        Comment comment = createComment(1L, item1, user1);
+        CommentDto commentDto = createCommentDto(1L, user1);
+        Comment comment = new Comment(null, "text", item1, user1);
 
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item1));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user1));
         when(commentRepository.save(any()))
                 .thenReturn(comment);
 
-        itemService.createComment(1L, 1L, comment);
+        itemService.createComment(item1.getId(), user1.getId(), commentDto);
 
         verify(commentRepository, times(1)).save(any());
     }
 
     @Test
-    void whenCreateComment_thenReturnComment() {
+    void whenCreateComment_thenReturnCommentDto() {
         User user1 = createUser(1L);
         Item item1 = createItem(1L);
+        CommentDto commentDto = createCommentDto(1L, user1);
+        Comment comment = new Comment(1L, "text", item1, user1);
 
-        Comment comment = createComment(1L, item1, user1);
-
+        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(item1));
+        when(userRepository.findById(anyLong())).thenReturn(Optional.of(user1));
         when(commentRepository.save(any()))
                 .thenReturn(comment);
 
-        CommentDto commentOutputDto = itemService.createComment(1L, 1L, comment);
+        CommentDto commentOutputDto = itemService.createComment(item.getId(), user1.getId(), commentDto);
 
-        assertEquals(1L, commentOutputDto.getId());
-        assertEquals("textComment1", commentOutputDto.getText());
-        assertEquals("user1", commentOutputDto.getAuthorName());
+        assertEquals(comment.getId(), commentOutputDto.getId());
+        assertEquals("text", commentOutputDto.getText());
+        assertEquals("user", commentOutputDto.getAuthorName());
         assertEquals(LocalDateTime.now()
                         .truncatedTo(ChronoUnit.SECONDS)
                         .format(DateTimeFormatter.ISO_DATE_TIME),
@@ -296,20 +301,20 @@ public class ItemUnitTest {
         );
     }
 
-    private Comment createComment(Long id, Item item, User user) {
-        return new Comment(
+    private CommentDto createCommentDto(Long id, User user) {
+        return new CommentDto(
                 id,
-                "textComment" + id,
-                item,
-                user
+                "textComment",
+                user.getName(),
+                LocalDateTime.now().plusHours(1)
         );
     }
 
     private User createUser(Long id) {
         return User.builder()
                 .id(id)
-                .name("user" + id)
-                .email("user" + id + "@email.ru")
+                .name("user")
+                .email("user" + "@email.ru")
                 .build();
     }
 

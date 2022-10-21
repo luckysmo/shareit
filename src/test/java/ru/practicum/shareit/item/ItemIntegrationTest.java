@@ -132,7 +132,7 @@ class ItemIntegrationTest {
     }
 
     @Test
-    public void whenCreateComment_thenReturnComment() {
+    public void whenCreateComment_thenReturnCommentDto() {
         User booker = createUser(1L);
         entityManager.persist(booker);
         User owner = createUser(2L);
@@ -153,16 +153,16 @@ class ItemIntegrationTest {
 
         entityManager.persist(booking);
 
-        Comment comment = Comment.builder()
-                .text("comment")
-                .author(booker)
+        CommentDto commentDto = CommentDto.builder()
+                .text("commentDto")
+                .authorName(booker.getName())
                 .build();
 
-        CommentDto createdComment = service.createComment(booker.getId(), item.getId(), comment);
+        CommentDto createdComment = service.createComment(item.getId(), booker.getId(), commentDto);
 
         assertThat(createdComment.getId(), notNullValue());
-        assertThat(comment.getText(), equalTo(createdComment.getText()));
-        assertThat(comment.getAuthor().getName(), equalTo(createdComment.getAuthorName()));
+        assertThat(commentDto.getText(), equalTo(createdComment.getText()));
+        assertThat(commentDto.getAuthorName(), equalTo(createdComment.getAuthorName()));
     }
 
     private Item createItem(Long id, User owner) {

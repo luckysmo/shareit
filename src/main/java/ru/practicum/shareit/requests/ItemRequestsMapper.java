@@ -8,6 +8,9 @@ import ru.practicum.shareit.requests.dto.ItemRequestDtoWithItems;
 
 import java.util.List;
 
+import static ru.practicum.shareit.user.UserMapper.mapToUser;
+import static ru.practicum.shareit.user.UserMapper.mapToUserDto;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemRequestsMapper {
 
@@ -15,7 +18,7 @@ public class ItemRequestsMapper {
         return new ItemRequest(
                 itemRequestDto.getId(),
                 itemRequestDto.getDescription(),
-                itemRequestDto.getRequester(),
+                mapToUser(itemRequestDto.getRequester()),
                 itemRequestDto.getCreated()
         );
     }
@@ -24,7 +27,7 @@ public class ItemRequestsMapper {
         return new ItemRequestDto(
                 itemRequest.getId(),
                 itemRequest.getDescription(),
-                itemRequest.getRequester(),
+                mapToUserDto(itemRequest.getRequester()),
                 itemRequest.getCreated()
         );
     }
@@ -34,7 +37,7 @@ public class ItemRequestsMapper {
         return new ItemRequestDtoWithItems(
                 itemRequest.getId(),
                 itemRequest.getDescription(),
-                itemRequest.getRequester(),
+                mapToUserDto(itemRequest.getRequester()),
                 itemRequest.getCreated(),
                 items
         );

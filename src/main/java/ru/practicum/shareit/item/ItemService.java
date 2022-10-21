@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static ru.practicum.shareit.item.CommentMapper.mapToComment;
 import static ru.practicum.shareit.item.CommentMapper.mapToCommentDto;
 import static ru.practicum.shareit.item.CommentMapper.mapToListCommentsDto;
 import static ru.practicum.shareit.item.ItemMapper.mapToItem;
@@ -160,12 +161,15 @@ public class ItemService {
     }
 
     @Transactional
-    public CommentDto createComment(long itemId, long userId, Comment comment) {
+    public CommentDto createComment(long itemId, long userId, CommentDto commentDto) {
         List<Booking> bookings = bookingRepository.findBookingByBooker_IdAndItem_Id(userId, itemId);
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item not found!!!"));
+        User author = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!!!"));
+        Comment comment = mapToComment(commentDto, author, item);
         for (Booking booking : bookings) {
             if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                Item item = itemRepository.findById(itemId).orElseThrow();
-                User author = userRepository.findById(userId).orElseThrow();
+                item = itemRepository.findById(itemId).orElseThrow();
+                author = userRepository.findById(userId).orElseThrow();
                 comment.setItem(item);
                 comment.setAuthor(author);
                 break;

@@ -12,7 +12,7 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.dto.ItemRequestDtoWithItems;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import static ru.practicum.shareit.requests.ItemRequestsMapper.mapToItemRequest;
 import static ru.practicum.shareit.requests.ItemRequestsMapper.mapToItemRequestDto;
 import static ru.practicum.shareit.requests.ItemRequestsMapper.mapToItemRequestDtoWithItems;
+import static ru.practicum.shareit.user.UserMapper.mapToUserDto;
 
 @Service
 public class ItemRequestService {
@@ -39,7 +40,7 @@ public class ItemRequestService {
 
     @Transactional
     public ItemRequestDto addRequest(Long userId, ItemRequestDto itemRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!!!"));
+        UserDto user = mapToUserDto(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!!!")));
 
         itemRequestDto.setRequester(user);
         itemRequestDto.setCreated(LocalDateTime.now());

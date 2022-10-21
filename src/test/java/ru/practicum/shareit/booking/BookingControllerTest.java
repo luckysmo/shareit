@@ -14,7 +14,6 @@ import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.enums.State;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserDto;
 
 import java.nio.charset.StandardCharsets;
@@ -45,7 +44,7 @@ class BookingControllerTest {
             1L,
             LocalDateTime.now().plusHours(1),
             LocalDateTime.now().plusHours(2),
-            new User(1L, "user", "email@mail.ru"),
+            new UserDto(1L, "user", "email@mail.ru"),
             BookingStatus.WAITING,
             new Item());
 

@@ -8,7 +8,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,9 +36,9 @@ public class UserServiceIntegrationTest {
 
     @Test
     void testGetById() {
-        Optional<User> user = Optional.of(mapToUser(userService.addNewUser(userDto)));
+        User user = mapToUser(userService.addNewUser(userDto));
 
-        Optional<User> byId = userService.getById(user.get().getId());
+        User byId = userService.getById(user.getId()).orElseThrow();
 
         assertEquals(user, byId);
     }

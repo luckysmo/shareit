@@ -54,11 +54,8 @@ public class BookingService {
             throw new NotFoundException("Owner can't booking his item!!!");
         }
         if (itemBooking.getAvailable()) {
-            if (bookingDto.getStart().isAfter(bookingDto.getEnd())) {
-                throw new ValidationException("Start is after end!!!");
-            }
-            if (bookingDto.getStart().equals(bookingDto.getEnd())) {
-                throw new ValidationException("Start cannot be equal to end!!!");
+            if (!bookingDto.getStart().isBefore(bookingDto.getEnd())) {
+                throw new ValidationException("Incorrect start or end time");
             }
             Booking booking = mapToBooking(bookingDto, itemBooking, booker);
             booking.setStatus(WAITING);

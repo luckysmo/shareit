@@ -53,7 +53,7 @@ public class BookingMapper {
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
-                booking.getBooker(),
+                mapToUserDto(booking.getBooker()),
                 booking.getStatus(),
                 booking.getItem()
         );

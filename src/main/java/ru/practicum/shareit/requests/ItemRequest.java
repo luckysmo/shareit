@@ -30,7 +30,7 @@ public class ItemRequest {
     private Long id;
     private String description;
     @ManyToOne
-    @JoinColumn(name = "requestor_id")
+    @JoinColumn(name = "requestor_id", nullable = false)
     private User requester;
     @Column(name = "created")
     private LocalDateTime created;
