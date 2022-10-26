@@ -1,5 +1,7 @@
 package ru.practicum.shareit.item;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
@@ -10,6 +12,8 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoForCreate;
+import ru.practicum.shareit.requests.ItemRequest;
+import ru.practicum.shareit.requests.ItemRequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -18,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static ru.practicum.shareit.item.CommentMapper.mapToComment;
 import static ru.practicum.shareit.item.CommentMapper.mapToCommentDto;
 import static ru.practicum.shareit.item.CommentMapper.mapToListCommentsDto;
 import static ru.practicum.shareit.item.ItemMapper.mapToItem;
@@ -32,22 +37,30 @@ public class ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository requestRepository;
 
     public ItemService(ItemRepository itemRepository,
                        UserRepository userRepository,
                        BookingRepository bookingRepository,
-                       CommentRepository commentRepository) {
+                       CommentRepository commentRepository,
+                       ItemRequestRepository itemRequestRepository) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.commentRepository = commentRepository;
+        this.requestRepository = itemRequestRepository;
     }
 
     @Transactional
     public ItemDtoForCreate addNewItem(long userId, ItemDtoForCreate itemDtoForCreate) {
         if (userRepository.existsById(userId)) {
             Item item = ItemMapper.mapToItem(itemDtoForCreate);
-            item.setOwnerId(userRepository.findById(userId).orElseThrow().getId());
+            if (itemDtoForCreate.getRequestId() != null) {
+                ItemRequest request = requestRepository.findById(itemDtoForCreate.getRequestId())
+                        .orElseThrow(() -> new NotFoundException("Request not found!!!"));
+                item.setRequest(request);
+            }
+            item.setOwner(userRepository.findById(userId).orElseThrow());
             itemRepository.save(item);
             return mapToItemDtoForCreate(item);
         } else {
@@ -60,7 +73,7 @@ public class ItemService {
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
         List<Comment> comments = commentRepository.findCommentByItem_Id(itemId);
         List<CommentDto> commentsDto = mapToListCommentsDto(comments);
-        if (ownerId == item.getOwnerId()) {
+        if (ownerId == item.getOwner().getId()) {
             List<Booking> bookings = bookingRepository.findBookingByItem_Id(itemId);
             return mapToItemDto(item, createLastBooker(bookings, itemId), createNextBooker(bookings, itemId), commentsDto);
         } else {
@@ -73,7 +86,7 @@ public class ItemService {
         Item itemExisted = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found!!!"));
         Item item = mapToItem(itemDtoForCreate);
-        if (itemExisted.getOwnerId() == userId) {
+        if (itemExisted.getOwner().getId() == userId) {
             if (item.getId() == null) {
                 item.setId(itemExisted.getId());
             }
@@ -83,11 +96,14 @@ public class ItemService {
             if (item.getDescription() != null) {
                 itemExisted.setDescription(item.getDescription());
             }
-            if (item.getOwnerId() != null) {
-                itemExisted.setOwnerId(item.getOwnerId());
+            if (item.getOwner() != null) {
+                itemExisted.setOwner(item.getOwner());
             }
             if (item.getAvailable() != null) {
                 itemExisted.setAvailable(item.getAvailable());
+            }
+            if (item.getRequest() != null) {
+                itemExisted.setRequest(item.getRequest());
             }
             return mapToItemDtoForCreate(itemExisted);
         } else {
@@ -95,10 +111,12 @@ public class ItemService {
         }
     }
 
-    public List<ItemDtoForCreate> searchItem(String text) {
+    public List<ItemDtoForCreate> searchItem(String text, Integer from, Integer size) {
+        int page = from < size ? 0 : from / size;
+        Pageable pageable = PageRequest.of(page, size);
         List<ItemDtoForCreate> result;
         if (!text.isBlank()) {
-            List<Item> itemsByNameOrDescriptionLikeIgnoreCase = itemRepository.search(text);
+            List<Item> itemsByNameOrDescriptionLikeIgnoreCase = itemRepository.search(text, pageable);
             result = mapToListItemDtoForCreate(itemsByNameOrDescriptionLikeIgnoreCase);
         } else {
             result = Collections.emptyList();
@@ -143,12 +161,15 @@ public class ItemService {
     }
 
     @Transactional
-    public CommentDto createComment(long itemId, long userId, Comment comment) {
+    public CommentDto createComment(long itemId, long userId, CommentDto commentDto) {
         List<Booking> bookings = bookingRepository.findBookingByBooker_IdAndItem_Id(userId, itemId);
+        Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item not found!!!"));
+        User author = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found!!!"));
+        Comment comment = mapToComment(commentDto, author, item);
         for (Booking booking : bookings) {
             if (booking.getEnd().isBefore(LocalDateTime.now())) {
-                Item item = itemRepository.findById(itemId).orElseThrow();
-                User author = userRepository.findById(userId).orElseThrow();
+                item = itemRepository.findById(itemId).orElseThrow();
+                author = userRepository.findById(userId).orElseThrow();
                 comment.setItem(item);
                 comment.setAuthor(author);
                 break;
@@ -159,11 +180,14 @@ public class ItemService {
         return mapToCommentDto(commentRepository.save(comment));
     }
 
-    public List<ItemDto> getAllItemsOfOneUser(long userId) {
+    public List<ItemDto> getAllItemsOfOneUser(long userId, Integer from, Integer size) {
+        int page = from < size ? 0 : from / size;
+        Pageable pageable = PageRequest.of(page, size);
         List<ItemDto> result = new ArrayList<>();
         List<Booking> bookings = bookingRepository.findBookingByItem_OwnerId(userId);
+
         if (userRepository.existsById(userId)) {
-            List<Item> allItemsOfOneUser = itemRepository.findItemsByOwnerIdOrderById(userId);
+            List<Item> allItemsOfOneUser = itemRepository.findItemsByOwnerIdOrderById(userId, pageable);
             for (Item item : allItemsOfOneUser) {
                 List<Comment> comments = commentRepository.findCommentByItem_Id(item.getId());
                 List<CommentDto> commentsDto = mapToListCommentsDto(comments);

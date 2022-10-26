@@ -35,18 +35,14 @@ public class UserServiceImpl implements UserService {
     public UserDto update(long userID, UserDto userDto) {
         User userExisting = repository.findById(userID).orElseThrow(() -> new NotFoundException("User not found!!!"));
         User user = mapToUser(userDto);
-        if (repository.existsById(userID)) {
-            user.setId(userID);
-            if (user.getEmail() != null) {
-                userExisting.setEmail(user.getEmail());
-            }
-            if (user.getName() != null) {
-                userExisting.setName(user.getName());
-            }
-            return mapToUserDto(userExisting);
-        } else {
-            throw new NotFoundException("User not found!!!");
+        user.setId(userID);
+        if (user.getEmail() != null) {
+            userExisting.setEmail(user.getEmail());
         }
+        if (user.getName() != null) {
+            userExisting.setName(user.getName());
+        }
+        return mapToUserDto(userExisting);
     }
 
     @Transactional
